@@ -1,0 +1,19 @@
+<?xml version = "1.0" ?>
+<launch>
+
+  <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find my_edu_rover_description)/worlds/edu_rover.world"/>
+    <!-- more default parameters can be changed here -->
+  </include>
+
+  <include file = "$(find my_edu_rover_description)/launch/spawn_edu_rover_xacro.launch">
+    <arg name = "x" value = "0.0" />
+    <arg name = "y" value = "0.0" />
+    <arg name = "z" value = "0.2" />
+    <arg name = "robot_name" value = "edu_rover" />
+
+  </include>
+  <include file="$(find my_edu_rover_description)/launch/edu_rover_control.launch"/>
+  
+</launch>

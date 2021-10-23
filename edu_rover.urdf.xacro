@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<robot name="edu_rover" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:property name="pi" value="3.14159274"/>
+
+  <xacro:include filename="$(find my_edu_rover_description)/urdf/base/base.urdf.xacro"/>
+
+<!-- =============== Link & Joint =============== -->
+  <!-- Base -->
+  <link name="dummy_link"/>
+  <xacro:base parent="dummy_link">
+    <origin xyz="0 0 0"/>
+  </xacro:base>
+
+<!-- =============== Gazebo =============== -->
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+    </plugin>
+  </gazebo>
+
+  <!-- Base -->
+  <xacro:chassis_gazebo/>
+
+</robot>

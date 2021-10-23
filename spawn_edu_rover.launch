@@ -1,0 +1,12 @@
+<launch>
+
+    <include file = "$(find my_edu_rover_description)/launch/spawn_edu_rover_xacro.launch">
+    <arg name = "x" value = "0.0" />
+    <arg name = "y" value = "0.0" />
+    <arg name = "z" value = "0.1" />
+    <arg name = "robot_name" value = "edu_rover" />
+    </include>
+
+    <include file="$(find my_edu_rover_description)/launch/edu_rover_control.launch"/>
+
+</launch>

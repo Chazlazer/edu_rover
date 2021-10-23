@@ -1,0 +1,277 @@
+<?xml version = "1.0"?>
+<robot xmlns:xacro = "https://www.ros.org/wiki/xacro" name = "edu_rover">
+    
+    <gazebo>
+        <plugin name = "gazebo_ros_control" filename = "libgazebo_ros_control.so">
+            <robotNamespace>/edu_rover</robotNamespace>
+        </plugin>
+    </gazebo>
+
+    <!--Parameter-->
+
+    <xacro:property name = "base_box_num" value = "0.16"/>
+    <xacro:property name = "knuckle_joint_x" value = "0.08"/>
+    <xacro:property name = "knuckle_joint_y" value = "0.005"/>
+
+    <!--MACROS-->
+    <xacro:macro name = "knuckle" params = "number">
+        <link name = "knuckle_${number}_link">
+            <inertial>
+                <origin xyz = "0 0 0" rpy = "0 0 0"/>
+                <mass value = "0.018649"/>
+                <inertia ixx = "4.507e-06" ixy = "0.0" ixz = "0.0" iyy = "1.2433e-06" iyz = "0.0" izz = "4.507e-06"/>
+            </inertial>
+
+            <collision>
+                <origin xyz = "0 0.025 0" rpy = "0 0 0"/>
+                <geometry>
+                    <box size = "0.02 0.05 0.02" />
+                </geometry>
+            </collision>
+
+            <visual>
+                <origin xyz = "0 0 0" rpy = "1.5708 0 0"/>
+                <geometry>
+                    <mesh filename="package://my_edu_rover_description/models/knuckle.STL"/>
+                </geometry>
+            </visual>
+        </link>
+
+        <gazebo reference = "knuckle_${number}_link">
+            <kp>100000.0</kp>
+            <kd>100000.0</kd>
+            <mu1>10.0</mu1>
+            <mu2>10.0</mu2>
+            <material>Gazebo/Grey</material>
+        </gazebo>
+    </xacro:macro>
+
+    <xacro:macro name = "wheel" params = "number">
+        <link name = "wheel_${number}_link">
+            <inertial>
+                <origin xyz = "0 0 0" rpy = "0 0 0"/>
+                <mass value = "0.038593"/>
+                <inertia ixx = "1.5759e-05" ixy = "0.0" ixz = "0.0" iyy = "1.5759e-05" iyz = "0.0" izz = "3.0874e-05"/>
+            </inertial>
+
+            <collision>
+                <origin xyz = "0 0 0" rpy = "1.5708 0 0"/>
+                <geometry>
+                    <cylinder radius = "0.04" length = "0.01"/>
+                </geometry>
+            </collision>
+
+            <visual>
+                <origin xyz = "0 0 0" rpy = "0 0 0"/>
+                <geometry>
+                    <mesh filename="package://my_edu_rover_description/models/wheel.STL"/>
+                </geometry>
+            </visual>
+        </link>
+
+        <gazebo reference="wheel_${number}_link">
+            <kp>100000.0</kp>
+            <kd>100000.0</kd>
+            <mu1>10.0</mu1>
+            <mu2>10.0</mu2>
+            <material>Gazebo/Black</material>
+        </gazebo>
+    </xacro:macro>
+
+    <xacro:macro name = "right_wheels_joint" params = "number">
+        <joint name = "wheel_${number}_joint" type = "continuous">
+            <parent link = "knuckle_${number}_link"/>
+            <child link = "wheel_${number}_link"/>
+            <origin xyz = "0 0.05 0" rpy = "0 0 0" />
+            <limit effort="0.177" velocity="28.3" />
+            <axis xyz = "0 1 0"/>
+        </joint>
+    </xacro:macro>
+
+    <xacro:macro name = "left_wheels_joint" params = "number">
+        <joint name = "wheel_${number}_joint" type = "continuous">
+            <parent link = "knuckle_${number}_link"/>
+            <child link = "wheel_${number}_link"/>
+            <origin xyz = "0 -0.05 0" rpy = "0 0 0" />
+            <limit effort="0.177" velocity="28.3" />
+            <axis xyz = "0 1 0"/>
+        </joint>
+    </xacro:macro>
+
+    <xacro:macro name = "knuckle_transmission" params = "knuckle_num tran_num">
+        <transmission name="tran${tran_num}">
+            <type>transmission_interface/SimpleTransmission</type>
+            <joint name="knuckle_${knuckle_num}_joint">
+                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            </joint>
+            <actuator name="servo_${knuckle_num}">
+                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+                <mechanicalReduction>1</mechanicalReduction>
+            </actuator>
+        </transmission>
+    </xacro:macro>
+
+    <xacro:macro name = "wheel_transmission" params = "wheel_num tran_num">
+        <transmission name="tran${tran_num}">
+            <type>transmission_interface/SimpleTransmission</type>
+            <joint name="wheel_${wheel_num}_joint">
+                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            </joint>
+            <actuator name="motor_${wheel_num}">
+                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+                <mechanicalReduction>1</mechanicalReduction>
+            </actuator>
+        </transmission>
+    </xacro:macro>
+    
+    <!--Link Definitions-->
+
+    <link name = "dummy_link">
+        <collision>
+            <origin xyz = "0 0 0" rpy = "0 0 0"/>
+            <geometry>
+                <box size = "0.15 0.1 0.036"/>
+            </geometry>
+        </collision>
+    </link>
+
+    <link name="base_link">
+        <inertial>
+            <origin xyz = "0 0 0" rpy = "0 0 0" />
+            <mass value = "0.36082"/>
+            <inertia ixx = "0.00034" ixy = "0.0" ixz = "0.0" iyy = "0.00081" iyz = "0.0" izz = "0.00107"/>
+        </inertial>
+
+        <collision>
+            <origin xyz = "0 0 0" rpy = "0 0 0" />
+            <geometry>
+                <box size = "${base_box_num} 0.1 0.036"/>
+            </geometry>
+        </collision>
+
+        <visual>
+            <origin xyz ="0.011 -0.13 0" rpy = "0 0 4.72984"/>
+            <geometry>
+                <mesh filename="package://edu_rover/models/base.STL"/>
+            </geometry>
+        </visual>
+    </link>
+
+    <joint name = "dummy_joint" type = "fixed">
+        <parent link = "dummy_link"/>
+        <child link = "base_link"/>
+    </joint>
+
+    <gazebo reference="base_link">
+        <kp>100000.0</kp>
+        <kd>100000.0</kd>
+        <mu1>10.0</mu1>
+        <mu2>10.0</mu2>
+        <material>Gazebo/Blue</material>
+    </gazebo>
+
+<!-- left_front ()-[III]-()
+                   [III]
+                   [III]
+                ()-[III]-()
+-->
+    
+    <xacro:knuckle number = "1"/>
+
+    <joint name = "knuckle_1_joint" type = "revolute">
+        <parent link = "base_link"/>
+        <child link = "knuckle_1_link"/>
+        <origin xyz = "${knuckle_joint_x} ${knuckle_joint_y} 0" rpy = "0 0 0 "/>
+        <limit lower = "-1.5708" upper = "0.52" effort = "0.1" velocity = "1.05"/>
+        <axis xyz = "0 0 1"/> 
+    </joint>
+
+    <xacro:knuckle_transmission knuckle_num = "1" tran_num = "1"/>
+
+    <xacro:wheel number = "1"/>
+    <xacro:left_wheels_joint number = "1"/>
+    <xacro:wheel_transmission wheel_num = "1" tran_num = "2"/>
+
+
+    <!-- ()-[III]-()right_front 
+            [III]
+            [III]
+         ()-[III]-()
+-->
+
+    <xacro:knuckle number = "2"/>
+
+    <joint name = "knuckle_2_joint" type = "revolute">
+        <parent link = "base_link"/>
+        <child link = "knuckle_2_link"/>
+        <origin xyz = "${knuckle_joint_x} -${knuckle_joint_y} 0" rpy = "0 0 0 "/>
+        <limit lower = "-0.52" upper = "1.5708" effort = "0.1" velocity = "1.05"/>
+        <axis xyz = "0 0 1"/> 
+    </joint>
+
+    <xacro:knuckle_transmission knuckle_num = "2" tran_num = "3"/>
+
+    <xacro:wheel number = "2"/>
+    <xacro:right_wheels_joint number = "2"/>
+    <xacro:wheel_transmission wheel_num = "2" tran_num = "4"/>
+
+
+    <!-- ()-[III]-()
+            [III]
+            [III]
+         ()-[III]-()right_back 
+-->
+
+    <xacro:knuckle number = "3"/>
+
+    <joint name = "knuckle_3_joint" type = "revolute">
+        <parent link = "base_link"/>
+        <child link = "knuckle_3_link"/>
+        <origin xyz = "-${knuckle_joint_x} -${knuckle_joint_y} 0" rpy = "0 0 0"/>
+        <limit lower = "-1.5708" upper = "0.52" effort = "0.1" velocity = "1.05"/>
+        <axis xyz = "0 0 1"/> 
+    </joint>
+
+    <xacro:knuckle_transmission knuckle_num = "3" tran_num = "5"/>
+
+    <xacro:wheel number = "3"/>
+    <xacro:right_wheels_joint number = "3"/>
+    <xacro:wheel_transmission wheel_num = "3" tran_num = "6"/>
+
+    <!--        ()-[III]-()
+                   [III]
+                   [III]
+      left_back ()-[III]-()
+-->
+
+    <xacro:knuckle number = "4"/>
+
+     <joint name = "knuckle_4_joint" type = "revolute">
+        <parent link = "base_link"/>
+        <child link = "knuckle_4_link"/>
+        <origin xyz = "-${knuckle_joint_x} ${knuckle_joint_y} 0" rpy = "0 0 0"/>
+        <limit lower = "-0.52" upper = "1.5708" effort = "0.1" velocity = "1.05"/>
+        <axis xyz = "0 0 1"/> 
+    </joint>
+
+    <xacro:knuckle_transmission knuckle_num = "4" tran_num = "7"/>
+
+    <xacro:wheel number = "4"/>
+    <xacro:left_wheels_joint number = "4"/>
+    <xacro:wheel_transmission wheel_num = "4" tran_num = "8"/>
+
+    <gazebo>
+        <plugin name = "gazebo_ros_imu_controller" filename = "libgazebo_ros_imu.so">
+            <robotNamespace>/edu_rover</robotNamespace>
+            <topicName>imu/data</topicName>
+            <serviceName>imu/service</serviceName>
+            <bodyName>base_link</bodyName>
+            <gaussianNoise>0</gaussianNoise>
+            <rpyOffsets>0 0 0</rpyOffsets>
+            <updateRate>100</updateRate>
+            <alwaysOn>true</alwaysOn>
+            <gaussianNoise>0</gaussianNoise>
+        </plugin>
+    </gazebo>
+    
+</robot>
