@@ -1,0 +1,10 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<launch>
+  <include file="$(find gazebo_ros)/launch/empty_world.launch" />
+  <node
+    name="spawn_model"
+    pkg="gazebo_ros"
+    type="spawn_model"
+    args="-file $(find edu_rover)/urdf/edu_rover.urdf -urdf -model edu_rover"
+    output="screen"/>
+</launch>

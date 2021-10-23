@@ -1,0 +1,19 @@
+<?xml version ="1.0" ?>
+<launch>
+<!-- Load joint controller configurations from YAML file to parameter server-->
+<param name="robot_description" command="cat $(find edu_rover)/urdf/edu_rover.urdf"/>
+<arg name="world_name" value="$(find edu_rover)/worlds/edu_rover.world"/>
+<rosparam file="$(find edu_rover)/config/edu_rover_control.yaml" command="load"/>
+<!-- load the controllers -->
+<node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" ns="/edu_rover"
+args="
+base_left_front_knuckle_controller left_front_knuckle_wheel_controller
+base_left_back_knuckle_controller left_back_knuckle_wheel_controller
+base_right_front_knuckle_controller right_front_knuckle_wheel_controller
+base_right_back_knuckle_controller right_back_knuckle_wheel_controller
+joint_state_controller"/>
+<!-- convert joint states to TF transforms for rviz, etc -->
+<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen">
+<remap from="/joint_states" to="/edu_rover/joint_states" />
+</node>
+</launch>
