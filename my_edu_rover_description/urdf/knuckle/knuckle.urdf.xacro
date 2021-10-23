@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find my_edu_rover_description)/urdf/knuckle/knuckle.transmission.xacro"/>
+  <xacro:include filename="$(find my_edu_rover_description)/urdf/knuckle/knuckle.gazebo.xacro"/>
+
+  <xacro:macro name="knuckle_joint" params="number parent xyz rpy lower upper side">
+	<joint name="knuckle_${number}_joint" type="revolute">
+	  <origin  xyz = "${xyz}" rpy = "${rpy}"/>
+	  <parent link="${parent}"/>
+	  <child link="knuckle_${number}_link"/>
+      <limit effort="5" velocity="6.28"  lower="${lower}" upper="${upper}" />
+      <axis xyz = "0 0 1"/>
+	</joint>
+
+    <link name="knuckle_${number}_link">
+	  <visual>
+      <origin xyz = "0 0 0.0002" rpy = "1.5707 0 0"/>
+		<geometry>
+		  <mesh filename="package://my_edu_rover_description/models/knuckle_${number}_link.STL"/>
+		</geometry>
+	  </visual>
+	  <collision>
+        <origin xyz = "0 0 0.0002" rpy = "1.5707 0 0"/>
+        <geometry>
+        <!---
+            <box size = "0.02 0.05 0.02" />-->
+            <mesh filename="package://my_edu_rover_description/models/knuckle_${number}_link.STL"/>
+        </geometry>
+	  </collision>
+	  <inertial>
+        <origin xyz = "0 0 0" rpy = "0 0 0"/>
+        <mass value = "0.018649"/>
+        <inertia ixx = "4.507e-06" ixy = "0.0" ixz = "0.0" iyy = "1.2433e-06" iyz = "0.0" izz = "4.507e-06"/>
+	  </inertial>
+	</link>
+  </xacro:macro>
+  
+</robot>

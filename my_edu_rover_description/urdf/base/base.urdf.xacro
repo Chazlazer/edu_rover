@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find my_edu_rover_description)/urdf/base/base.gazebo.xacro"/>
+  
+  <xacro:macro name="base" params="parent *joint_origin">
+	<joint name="base_link_joint" type="fixed">
+	  <xacro:insert_block name="joint_origin"/>
+	  <parent link="${parent}"/>
+	  <child link="base_link"/>
+	</joint>
+
+	<link name="base_link">
+	  <visual>
+	  <origin xyz = "0 0 0" rpy = "-1.5707 0 0"/>
+		<geometry>
+		  <mesh filename="package://my_edu_rover_description/models/base_link.STL"/>
+		</geometry>
+	  </visual>
+	  <collision>
+		<geometry>
+		  <box size = "0.15295 0.09779 0.036"/>
+		</geometry>
+	  </collision>
+	  <inertial>
+		<origin xyz="0 0 0"/>
+        <mass value = "0.36082"/>
+		<inertia ixx = "0.00034" ixy = "0.0" ixz = "0.0" iyy = "0.00081" iyz = "0.0" izz = "0.00107"/>
+	  </inertial>
+	</link>
+  </xacro:macro>
+  
+</robot>
