@@ -1,0 +1,13 @@
+<launch>
+<!-- roslaunch edu_rover udrf_visualize.launch model:='$('find' edu_rover)/urdf/edu_rover_simple.urdf' -->
+<arg name = "model" default =""/>
+<param name = "robot_description" command = "cat $(arg model)"/>
+
+<node name = "joint_state_publisher" pkg = "joint_state_publisher" type = "joint_state_publisher"/>
+<!--<param name = "use_gui" value = "TRUE"/> </node>-->
+
+<node name = "joint_state_publisher_gui" pkg = "joint_state_publisher_gui" type = "joint_state_publisher_gui"/>
+<node name = "robot_state_publisher" pkg = "robot_state_publisher" type = "robot_state_publisher"/>
+
+<node name = "rviz" pkg = "rviz" type = "rviz" args = ""/>
+</launch>
